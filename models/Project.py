@@ -23,7 +23,7 @@ class Project(object):
         self.http_url_to_repo = _json['http_url_to_repo']
         self.web_url = _json['web_url']
         self.tag_list = _json['tag_list']
-        self.owner = _json['owner']
+        # self.owner = _json['owner']
         self.name = _json['name']
         self.name_with_namespace = _json['name_with_namespace']
         self.path = _json['path']
@@ -43,7 +43,7 @@ class Project(object):
         self.shared_runners_enabled = _json['shared_runners_enabled']
         self.forks_count = _json['forks_count']
         self.star_count = _json['star_count']
-        self.runners_token = _json['runners_token']
+        # self.runners_token = _json['runners_token']
         self.public_builds = _json['public_builds']
 
         self.milestones = []
@@ -51,7 +51,7 @@ class Project(object):
         self.tags = []
 
     @classmethod
-    def findAll():
+    def findAll(cls):
         _jsons = requests.get("{}/api/v3/projects".format(config.HOST),
                               headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
         return [Project(_json=_json) for _json in _jsons]
