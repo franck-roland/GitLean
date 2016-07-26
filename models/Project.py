@@ -1,7 +1,7 @@
 import requests
 import config
 from .Milestone import Milestone
-from factories.IssueFactory import IssueFactory
+from controllers.IssueController import IssueController
 from .Tag import Tag
 from dateutil.parser import parse
 
@@ -93,9 +93,7 @@ class Project(object):
         per_page = 100
         if not self.issues:
             while True:
-                issues = [IssueFactory.factory(self, _json=json_issue)
-                          for json_issue in requests.get("{}/api/v3/projects/{}/issues?page={}&per_page={}".format(config.HOST, self.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-                          ]
+                issues = IssueController.findAll(self)
                 if not issues:
                     break
                 self.issues += issues
