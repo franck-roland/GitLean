@@ -55,8 +55,17 @@ class IssueController(AbstractGitlabElementController):
 
     @classmethod
     def __findAllFromHTTPQuery(cls, project):
-        _jsons = requests.get("{}/api/v3/projects/{}/issues".format(config.HOST, project.id),
-                              headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+        page = 1
+        per_page = 10
+        _jsons = []
+        while True:
+            result = requests.get("{}/api/v3/projects/{}/issues?page={}&per_page={}".format(config.HOST, project.id, page, per_page),
+                                  headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+            if not result:
+                break
+            _jsons += result
+            page += 1
+
         for _json in _jsons:
             CacheFactory.cnx().set("project:{}:issue:{}".format(project.id, _json['id']), _json)
             CacheFactory.cnx().pushToList("projects:{}:issues".format(project.id), "project:{}:issue:{}".format(project.id, _json['id']))

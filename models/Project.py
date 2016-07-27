@@ -89,17 +89,8 @@ class Project(object):
         return self.tags
 
     def findAllIssues(self):
-        page = 1
-        per_page = 100
         if not self.issues:
-            while True:
-                issues = IssueController.findAll(self)
-                if not issues:
-                    break
-                self.issues += issues
-                if len(issues) < per_page:
-                    break
-                page += 1
+            self.issues = IssueController.findAll(self)
         return self.issues
 
     def getId(self):
