@@ -1,6 +1,6 @@
 import config
 import requests
-from factories.NoteFactory import NoteFactory
+from controllers.NoteController import NoteController
 
 
 class Issue:
@@ -38,6 +38,5 @@ class Issue:
 
     def findAllNotes(self):
         if not self.notes:
-            self.notes = sorted([NoteFactory.factory(self.project, self, json_note=json_note) for json_note in requests.get("{}/api/v3/projects/{}/issues/{}/notes".format(config.HOST, self.project.id, self.id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()],
-                                key=lambda x: x.created_at)
+            self.notes = sorted(NoteController.findAll(self.project, self), key=lambda x: x.created_at)
         return self.notes

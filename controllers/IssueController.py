@@ -24,7 +24,7 @@ class IssueController(AbstractGitlabElementController):
 
     @classmethod
     def find(cls, project, _id):
-        _json = CacheFactory.cnx().get("project:{}:issue:{}".format(project.id, _id))
+        _json = CacheFactory.cnx().get("projects:{}:issues:{}".format(project.id, _id))
         if not _json:
             return cls.__findFromHTTPQuery(_id, project)
         return cls(_json=_json).getIssue()
@@ -49,9 +49,9 @@ class IssueController(AbstractGitlabElementController):
         _json = requests.get("{}/api/v3/projects/{}/issues/{}".format(config.HOST, project.id, _id),
                              headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
         if _json:
-            CacheFactory.cnx().set("project:{}:issue:{}".format(project.id, _json['id']), _json)
-            CacheFactory.cnx().pushToList("projects:{}:issues".format(project.id), "project:{}:issue:{}".format(project.id, _json['id']))
-        return IssueFactory.factory(_json=_json)
+            CacheFactory.cnx().set("projects:{}:issues:{}".format(project.id, _json['id']), _json)
+            CacheFactory.cnx().pushToList("projects:{}:issues".format(project.id), "projects:{}:issues:{}".format(project.id, _json['id']))
+        return IssueFactory.factory(project, _json=_json)
 
     @classmethod
     def __findAllFromHTTPQuery(cls, project):
@@ -67,6 +67,6 @@ class IssueController(AbstractGitlabElementController):
             page += 1
 
         for _json in _jsons:
-            CacheFactory.cnx().set("project:{}:issue:{}".format(project.id, _json['id']), _json)
-            CacheFactory.cnx().pushToList("projects:{}:issues".format(project.id), "project:{}:issue:{}".format(project.id, _json['id']))
+            CacheFactory.cnx().set("projects:{}:issues:{}".format(project.id, _json['id']), _json)
+            CacheFactory.cnx().pushToList("projects:{}:issues".format(project.id), "projects:{}:issues:{}".format(project.id, _json['id']))
         return [IssueController(project, _json=_json).getIssue() for _json in _jsons]

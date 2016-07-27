@@ -20,7 +20,7 @@ class ProjectController(AbstractGitlabElementController):
 
     @classmethod
     def find(cls, _id):
-        _json = CacheFactory.cnx().get("project:{}".format(_id))
+        _json = CacheFactory.cnx().get("projects:{}".format(_id))
         if not _json:
             return cls.__findFromHTTPQuery(_id)
         return cls(_json=_json).getProject()
@@ -45,8 +45,8 @@ class ProjectController(AbstractGitlabElementController):
         _json = requests.get("{}/api/v3/projects/{}".format(config.HOST, _id),
                              headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
         if _json:
-            CacheFactory.cnx().set("project:{}".format(_json['id']), _json)
-            CacheFactory.cnx().pushToList("projects", "project:{}".format(_json['id']))
+            CacheFactory.cnx().set("projects:{}".format(_json['id']), _json)
+            CacheFactory.cnx().pushToList("projects", "projects:{}".format(_json['id']))
         return Project(_json=_json)
 
     @classmethod
@@ -54,6 +54,6 @@ class ProjectController(AbstractGitlabElementController):
         _jsons = requests.get("{}/api/v3/projects".format(config.HOST),
                               headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
         for _json in _jsons:
-            CacheFactory.cnx().set("project:{}".format(_json['id']), _json)
-            CacheFactory.cnx().pushToList("projects", "project:{}".format(_json['id']))
+            CacheFactory.cnx().set("projects:{}".format(_json['id']), _json)
+            CacheFactory.cnx().pushToList("projects", "projects:{}".format(_json['id']))
         return [ProjectController(_json=_json).getProject() for _json in _jsons]
