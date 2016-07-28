@@ -2,6 +2,7 @@ import requests
 import config
 from .Milestone import Milestone
 from controllers.IssueController import IssueController
+from controllers.MilestoneController import MilestoneController
 from .Tag import Tag
 from dateutil.parser import parse
 
@@ -46,19 +47,8 @@ class Project(object):
         self.tags = []
 
     def findAllMilestones(self):
-        page = 1
-        per_page = 100
         if not self.milestones:
-            while True:
-                milestones = [Milestone(self, _json=_json)
-                              for _json in requests.get("{}/api/v3/projects/{}/milestones?page={}&per_page={}".format(config.HOST, self.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-                              ]
-                if not milestones:
-                    break
-                self.milestones += milestones
-                if len(milestones) < per_page:
-                    break
-                page += 1
+            self.milestones = MilestoneController.findAll(self)
         return self.milestones
 
     def findAllTags(self):

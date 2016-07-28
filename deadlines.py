@@ -13,6 +13,7 @@ if __name__ == '__main__':
         for project in ProjectController.findAll():
             if project.name in config.PROJECTS:
                 issues = project.findAllIssues()
+                milestones = project.findAllMilestones()
                 for issue in issues:
                     print(issue)
                     for note in issue.findAllNotes():

@@ -1,18 +1,10 @@
-import requests
-import config
 from controllers.IssueController import IssueController
 from dateutil.parser import parse
 
 
 class Milestone:
 
-    def __init__(self, project, _id=None, _json={}):
-        if _id:
-            _json = requests.get(
-                "{}/api/v3/projects/{}/milestones/{}".format(
-                    config.HOST, project.id, _id),
-                headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-        print(_json)
+    def __init__(self, project, _json={}):
         self.id = _json['id']
         self.iid = _json['iid']
         self.project = project
