@@ -4,6 +4,14 @@ from cache.factories.CacheFactory import CacheFactory
 
 class AbstractGitlabElementController(metaclass=ABCMeta):
 
+    @classmethod
+    def getIdFieldFromJson(cls, _json):
+        return _json['id']
+
+    @classmethod
+    def getIdFromCacheKey(cls, cache_key):
+        return cache_key[cache_key.rfind(":") + 1:]
+
     @abstractmethod
     def getModel(self):
         pass
@@ -34,20 +42,26 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
     @classmethod
     def findAll(cls, *args, **kwargs):
         _jsons = []
-        _names = CacheFactory.cnx().findList(cls.getCacheListKey(*args))
-        if not _names:
+        cache_keys = CacheFactory.cnx().findList(cls.getCacheListKey(*args))
+
+        if not cache_keys:
             _jsons = cls.__findAllFromHTTPQuery(*args, **kwargs)
+
         else:
-            for _name in _names:
-                _json = CacheFactory.cnx().get(_name)
+            for cache_key in cache_keys:
+
+                _json = CacheFactory.cnx().get(cache_key)
+
                 if not _json:
-                    CacheFactory.cnx().removeAllValues(cls.getCacheListKey(*args), _name)
-                    _name = _name.decode('utf-8')
+                    CacheFactory.cnx().removeAllValues(cls.getCacheListKey(*args), cache_key)
+                    cache_key = cache_key.decode('utf-8')
                     params = list(args)
-                    params.append(_name[_name.rfind(":") + 1:])
+                    params.append(cls.getIdFromCacheKey(cache_key))
                     _json = cls.__findFromHTTPQuery(*params)
+
                 if _json:
                     _jsons.append(_json)
+
         return [cls(*args, _json=_json).getModel() for _json in _jsons]
 
     @classmethod
@@ -71,7 +85,7 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
 
             for _json in result:
                 params = list(args)
-                params.append(_json['id'])
+                params.append(cls.getIdFieldFromJson(_json))
                 CacheFactory.cnx().set(cls.getCacheKey(*params), _json)
                 CacheFactory.cnx().pushToList(cls.getCacheListKey(*params), cls.getCacheKey(*params))
             _jsons += result

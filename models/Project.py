@@ -1,9 +1,6 @@
-import requests
-import config
-from .Milestone import Milestone
 from controllers.IssueController import IssueController
 from controllers.MilestoneController import MilestoneController
-from .Tag import Tag
+from controllers.TagController import TagController
 from dateutil.parser import parse
 
 
@@ -52,19 +49,8 @@ class Project(object):
         return self.milestones
 
     def findAllTags(self):
-        page = 1
-        per_page = 100
         if not self.tags:
-            while True:
-                tags = [Tag(self, _json=_json)
-                        for _json in requests.get("{}/api/v3/projects/{}/repository/tags?page={}&per_page={}".format(config.HOST, self.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-                        ]
-                if not tags:
-                    break
-                self.tags += tags
-                if len(tags) < per_page:
-                    break
-                page += 1
+            self.tags = TagController.findAll(self)
         return self.tags
 
     def findAllIssues(self):
