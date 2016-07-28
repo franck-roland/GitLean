@@ -8,39 +8,35 @@ class IssueController(AbstractGitlabElementController):
 
     def __init__(self, project, _id=None, _json={}):
 
-        self._project = project
-
+        self.project = project
+        self._id = _id
+        self.issue = None
         if _json:
-            self._issue = IssueFactory.factory(project, _json=_json)
-        elif _id:
-            self._issue = IssueController.find(project, _id)
-        else:
-            raise ValueError()
+            self.issue = IssueFactory.factory(project, _json=_json)
+
+    def getInstanciationFields(self):
+        return [self.project]
 
     def getProject(self):
-        return self._project
+        return self.project
 
     def getIssue(self):
-        return self._issue
+        return self.issue
 
     def getModel(self):
-        return self._issue
+        return self.issue
 
-    @classmethod
-    def getCacheKey(cls, project, _id):
-        return "projects:{}:issues:{}".format(project.id, _id)
+    def getCacheKey(self):
+        return "projects:{}:issues:{}".format(self.project.id, self._id)
 
-    @classmethod
-    def getCacheListKey(cls, project, *args):
-        return "projects:{}:issues".format(project.id)
+    def getCacheListKey(self):
+        return "projects:{}:issues".format(self.project.id)
 
-    @classmethod
-    def requestsById(cls, project, _id):
-        return requests.get("{}/api/v3/projects/{}/issues/{}".format(config.HOST, project.id, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsById(self):
+        return requests.get("{}/api/v3/projects/{}/issues/{}".format(config.HOST, self.project.id, self._id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
-    @classmethod
-    def requestsAll(cls, project, page, per_page, milestone=None):
-        request = "{}/api/v3/projects/{}/issues".format(config.HOST, project.id)
+    def requestsAll(self, page, per_page, milestone=None):
+        request = "{}/api/v3/projects/{}/issues".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
         if milestone:
             request_parameters += "&milestone=" + milestone.title

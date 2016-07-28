@@ -4,8 +4,8 @@ from controllers.NoteController import NoteController
 class Issue:
 
     def __init__(self, project, _json={}):
-        self.id = _json['id']
         self.project = project
+        self.id = _json['id']
         self.project_id = _json['project_id']
         self.author_id = _json['author']['id']
 
@@ -31,5 +31,5 @@ class Issue:
 
     def findAllNotes(self):
         if not self.notes:
-            self.notes = sorted(NoteController.findAll(self), key=lambda x: x.created_at)
+            self.notes = sorted(NoteController(self).findAll(), key=lambda x: x.created_at)
         return self.notes

@@ -16,36 +16,42 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
     def getModel(self):
         pass
 
+    @abstractmethod
+    def getInstanciationFields(self):
+        pass
+
     @classmethod
-    def getCacheKey(cls, *args):
+    def getFieldNameFromParameterName(cls, parameter_name):
+        return parameter_name
+
+    def getCacheKey(self):
+        raise NotImplementedError
+
+    def getCacheListKey(self):
+        raise NotImplementedError
+
+    def requestsById(self):
+        raise NotImplementedError
+
+    def requestsAll(self, page, per_page, **kwargs):
         raise NotImplementedError
 
     @classmethod
-    def getCacheListKey(cls, *args):
-        raise NotImplementedError
+    def filter(cls, results, **kwargs):
+        return results
 
-    @classmethod
-    def requestsById(cls, *args):
-        raise NotImplementedError
-
-    @classmethod
-    def requestsAll(cls, *args, **kwargs):
-        raise NotImplementedError
-
-    @classmethod
-    def find(cls, *args):
-        _json = CacheFactory.cnx().get(cls.getCacheKey(*args))
+    def find(self):
+        _json = CacheFactory.cnx().get(self.getCacheKey())
         if not _json:
-            _json = cls.__findFromHTTPQuery(*args)
-        return cls(*args, _json=_json).getModel()
+            _json = self.__findFromHTTPQuery()
+        return self.getModel()
 
-    @classmethod
-    def findAll(cls, *args, **kwargs):
+    def findAll(self, **kwargs):
         _jsons = []
-        cache_keys = CacheFactory.cnx().findList(cls.getCacheListKey(*args))
+        cache_keys = CacheFactory.cnx().findList(self.getCacheListKey())
 
         if not cache_keys:
-            _jsons = cls.__findAllFromHTTPQuery(*args, **kwargs)
+            _jsons = self.__findAllFromHTTPQuery(**kwargs)
 
         else:
             for cache_key in cache_keys:
@@ -53,41 +59,37 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
                 _json = CacheFactory.cnx().get(cache_key)
 
                 if not _json:
-                    CacheFactory.cnx().removeAllValues(cls.getCacheListKey(*args), cache_key)
+                    CacheFactory.cnx().removeAllValues(self.getCacheListKey(), cache_key)
                     cache_key = cache_key.decode('utf-8')
-                    params = list(args)
-                    params.append(cls.getIdFromCacheKey(cache_key))
-                    _json = cls.__findFromHTTPQuery(*params)
+                    self._id = self.getIdFromCacheKey(cache_key)
+                    _json = self.__findFromHTTPQuery()
 
                 if _json:
                     _jsons.append(_json)
 
-        return [cls(*args, _json=_json).getModel() for _json in _jsons]
+        return [self.__class__(*list(self.getInstanciationFields()), _json=_json).getModel() for _json in _jsons]
 
-    @classmethod
-    def __findFromHTTPQuery(cls, *args):
-        _json = cls.requestsById(*args)
+    def __findFromHTTPQuery(self):
+        _json = self.requestsById()
         if _json:
-            CacheFactory.cnx().set(cls.getCacheKey(*args), _json)
-            CacheFactory.cnx().pushToList(cls.getCacheListKey(*args), cls.getCacheKey(*args))
+            CacheFactory.cnx().set(self.getCacheKey(), _json)
+            CacheFactory.cnx().pushToList(self.getCacheListKey(), self.getCacheKey())
         return _json
 
-    @classmethod
-    def __findAllFromHTTPQuery(cls, *args, **kwargs):
+    def __findAllFromHTTPQuery(self, **kwargs):
         page = 1
         per_page = 10
         _jsons = []
         while True:
-            result = cls.requestsAll(*args, page, per_page, **kwargs)
+            result = self.requestsAll(page, per_page, **kwargs)
 
             if not result:
                 break
 
             for _json in result:
-                params = list(args)
-                params.append(cls.getIdFieldFromJson(_json))
-                CacheFactory.cnx().set(cls.getCacheKey(*params), _json)
-                CacheFactory.cnx().pushToList(cls.getCacheListKey(*params), cls.getCacheKey(*params))
+                self._id = self.getIdFieldFromJson(_json)
+                CacheFactory.cnx().set(self.getCacheKey(), _json)
+                CacheFactory.cnx().pushToList(self.getCacheListKey(), self.getCacheKey())
             _jsons += result
             page += 1
 

@@ -16,7 +16,7 @@ class RedisCache(AbstractCache):
 
         return json.loads(result.decode('utf-8'))
 
-    def set(self, _id, _dict, expire=480):
+    def set(self, _id, _dict, expire=3600):
         result = self.redis_instance.set(_id, json.dumps(_dict))
         self.redis_instance.expire(_id, expire)
         return result

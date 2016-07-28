@@ -8,17 +8,17 @@ class NoteController(AbstractGitlabElementController):
 
     def __init__(self, issue, _id=None, _json={}):
 
-        self._issue = issue
-
+        self.issue = issue
+        self._id = _id
+        self._note = None
         if _json:
             self._note = NoteFactory.factory(issue, _json=_json)
-        elif _id:
-            self._note = NoteController.find(issue, _id)
-        else:
-            raise ValueError()
+
+    def getInstanciationFields(self):
+        return [self.issue]
 
     def getIssue(self):
-        return self._issue
+        return self.issue
 
     def getNote(self):
         return self._note
@@ -26,18 +26,14 @@ class NoteController(AbstractGitlabElementController):
     def getModel(self):
         return self._note
 
-    @classmethod
-    def getCacheKey(cls, issue, _id):
-        return "projects:{}:issues:{}:note:{}".format(issue.project.id, issue.id, _id)
+    def getCacheKey(self):
+        return "projects:{}:issues:{}:notes:{}".format(self.issue.project.id, self.issue.id, self._id)
 
-    @classmethod
-    def getCacheListKey(cls, issue, *args):
-        return "projects:{}:issues:{}:notes".format(issue.project.id, issue.id)
+    def getCacheListKey(self):
+        return "projects:{}:issues:{}:notes".format(self.issue.project.id, self.issue.id)
 
-    @classmethod
-    def requestsById(cls, issue, _id):
-        return requests.get("{}/api/v3/projects/{}/issues/{}/notes/{}".format(config.HOST, issue.project.id, issue.id, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsById(self):
+        return requests.get("{}/api/v3/projects/{}/issues/{}/notes/{}".format(config.HOST, self.issue.project.id, self.issue.id, self._id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
-    @classmethod
-    def requestsAll(cls, issue, page, per_page):
-        return requests.get("{}/api/v3/projects/{}/issues/{}/notes?page={}&per_page={}".format(config.HOST, issue.project.id, issue.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsAll(self, page, per_page):
+        return requests.get("{}/api/v3/projects/{}/issues/{}/notes?page={}&per_page={}".format(config.HOST, self.issue.project.id, self.issue.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()

@@ -8,31 +8,32 @@ class ProjectController(AbstractGitlabElementController):
 
     def __init__(self, _id=None, _json={}):
 
+        self._id = _id
+        self.project = None
         if _json:
-            self._project = Project(_json=_json)
-        elif _id:
-            self._project = ProjectController.find(_id)
-        else:
-            raise ValueError()
+            self.project = Project(_json=_json)
+
+    def getInstanciationFields(self):
+        return []
 
     def getProject(self):
-        return self._project
+        return self.project
 
     def getModel(self):
-        return self._project
+        return self.project
 
-    @classmethod
-    def getCacheKey(cls, _id):
-        return "projects:{}".format(_id)
+    def getCacheKey(self):
+        if not self._id:
+            raise ValueError
+        return "projects:{}".format(self._id)
 
-    @classmethod
-    def getCacheListKey(cls, *args):
+    def getCacheListKey(self):
         return "projects"
 
-    @classmethod
-    def requestsById(cls, _id):
-        return requests.get("{}/api/v3/projects/{}".format(config.HOST, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsById(self):
+        if not self._id:
+            raise ValueError
+        return requests.get("{}/api/v3/projects/{}".format(config.HOST, self._id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
-    @classmethod
-    def requestsAll(cls, page, per_page):
+    def requestsAll(self, page, per_page):
         return requests.get("{}/api/v3/projects?page={}&per_page={}".format(config.HOST, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()

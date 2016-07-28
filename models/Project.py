@@ -47,20 +47,20 @@ class Project(object):
 
     def findAllMilestones(self):
         if not self.milestones:
-            self.milestones = MilestoneController.findAll(self)
+            self.milestones = MilestoneController(self).findAll()
         return self.milestones
 
     def findAllTags(self):
         if not self.tags:
-            self.tags = TagController.findAll(self)
+            self.tags = TagController(self).findAll()
         return self.tags
 
     def findAllIssues(self):
         if not self.issues:
-            self.issues = IssueController.findAll(self)
+            self.issues = IssueController(self).findAll()
         return self.issues
 
     def findAllCommits(self):
         if not self.commits:
-            self.commits = CommitController.findAll(self)
+            self.commits = CommitController(self).findAll()
         return self.commits

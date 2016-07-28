@@ -10,3 +10,4 @@ class Note:
 # if 'created_at' in _json:
         self.created_at = parse(_json['created_at'])
         self.author_id = _json['author']['id']
+        self.issue = issue

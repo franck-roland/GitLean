@@ -8,41 +8,38 @@ class CommitController(AbstractGitlabElementController):
 
     def __init__(self, project, _id=None, _json={}):
 
-        self._project = project
-
+        self.project = project
+        self._id = _id
+        self.commit = None
         if _json:
-            self._commit = Commit(project, _json=_json)
-        elif _id:
-            self._commit = CommitController.find(project, _id)
-        else:
-            raise ValueError()
+            self.commit = Commit(project, _json=_json)
+
+    def getInstanciationFields(self):
+        return [self.project]
 
     def getProject(self):
-        return self._project
+        return self.project
 
     def getCommit(self):
-        return self._commit
+        return self.commit
 
     def getModel(self):
-        return self._commit
+        return self.commit
 
-    @classmethod
-    def getCacheKey(cls, project, _name):
-        return "projects:{}:commits:{}".format(project.id, _name)
+    def getCacheKey(self):
+        return "projects:{}:commits:{}".format(self.project.id, self._id)
 
-    @classmethod
-    def getCacheListKey(cls, project, *args):
-        return "projects:{}:commits".format(project.id)
+    def getCacheListKey(self):
+        return "projects:{}:commits".format(self.project.id)
 
-    @classmethod
-    def requestsById(cls, project, _id):
-        return requests.get("{}/api/v3/projects/{}/repository/commits/{}".format(config.HOST, project.id, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsById(self):
+        return requests.get("{}/api/v3/projects/{}/repository/commits/{}".format(config.HOST, self.project.id, self._id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
-    @classmethod
-    def requestsAll(cls, project, page, per_page):
+    def requestsAll(self, page, per_page):
         # No pagination on /commits
         if page != 1:
             return []
-        request = "{}/api/v3/projects/{}/repository/commits".format(config.HOST, project.id)
+        request = "{}/api/v3/projects/{}/repository/commits".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
+        print(request + "?" + request_parameters)
         return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()

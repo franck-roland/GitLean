@@ -8,17 +8,17 @@ class MilestoneController(AbstractGitlabElementController):
 
     def __init__(self, project, _id=None, _json={}):
 
-        self._project = project
-
+        self.project = project
+        self._id = _id
+        self._milestone = None
         if _json:
             self._milestone = Milestone(project, _json=_json)
-        elif _id:
-            self._milestone = MilestoneController.find(project, _id)
-        else:
-            raise ValueError()
+
+    def getInstanciationFields(self):
+        return [self.project]
 
     def getProject(self):
-        return self._project
+        return self.project
 
     def getMilestone(self):
         return self._milestone
@@ -26,20 +26,16 @@ class MilestoneController(AbstractGitlabElementController):
     def getModel(self):
         return self._milestone
 
-    @classmethod
-    def getCacheKey(cls, project, _id):
-        return "projects:{}:milestones:{}".format(project.id, _id)
+    def getCacheKey(self):
+        return "projects:{}:milestones:{}".format(self.project.id, self._id)
 
-    @classmethod
-    def getCacheListKey(cls, project, *args):
-        return "projects:{}:milestones".format(project.id)
+    def getCacheListKey(self):
+        return "projects:{}:milestones".format(self.project.id)
 
-    @classmethod
-    def requestsById(cls, project, _id):
-        return requests.get("{}/api/v3/projects/{}/milestones/{}".format(config.HOST, project.id, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsById(self):
+        return requests.get("{}/api/v3/projects/{}/milestones/{}".format(config.HOST, self.project.id, self._id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
-    @classmethod
-    def requestsAll(cls, project, page, per_page):
-        request = "{}/api/v3/projects/{}/milestones".format(config.HOST, project.id)
+    def requestsAll(self, page, per_page):
+        request = "{}/api/v3/projects/{}/milestones".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
         return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
