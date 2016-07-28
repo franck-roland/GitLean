@@ -14,9 +14,8 @@ if __name__ == '__main__':
             if project.name in config.PROJECTS:
                 issues = project.findAllIssues()
                 milestones = project.findAllMilestones()
-                print("milestones done")
                 tags = project.findAllTags()
+                commits = project.findAllCommits()
                 for issue in issues:
-                    print(issue)
                     for note in issue.findAllNotes():
-                        print(note)
+                        pass

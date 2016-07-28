@@ -1,5 +1,6 @@
 from controllers.IssueController import IssueController
 from controllers.MilestoneController import MilestoneController
+from controllers.CommitController import CommitController
 from controllers.TagController import TagController
 from dateutil.parser import parse
 
@@ -42,6 +43,7 @@ class Project(object):
         self.milestones = []
         self.issues = []
         self.tags = []
+        self.commits = []
 
     def findAllMilestones(self):
         if not self.milestones:
@@ -57,3 +59,8 @@ class Project(object):
         if not self.issues:
             self.issues = IssueController.findAll(self)
         return self.issues
+
+    def findAllCommits(self):
+        if not self.commits:
+            self.commits = CommitController.findAll(self)
+        return self.commits

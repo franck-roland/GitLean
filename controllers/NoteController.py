@@ -13,7 +13,7 @@ class NoteController(AbstractGitlabElementController):
         if _json:
             self._note = NoteFactory.factory(issue, _json=_json)
         elif _id:
-            self._note = NoteController.find(_id)
+            self._note = NoteController.find(issue, _id)
         else:
             raise ValueError()
 

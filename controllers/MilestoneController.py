@@ -13,7 +13,7 @@ class MilestoneController(AbstractGitlabElementController):
         if _json:
             self._milestone = Milestone(project, _json=_json)
         elif _id:
-            self._milestone = MilestoneController.find(_id)
+            self._milestone = MilestoneController.find(project, _id)
         else:
             raise ValueError()
 

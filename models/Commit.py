@@ -1,15 +1,8 @@
-import requests
-import config
 
 
 class Commit:
 
-    def __init__(self, project, sha=None, _json={}):
-        if sha:
-            _json = requests.get(
-                "{}/api/v3/projects/{}/repository/commits/{}".format(
-                    config.HOST, project.id, sha),
-                headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def __init__(self, project, _json={}):
         self.sha = _json['id']
         self.committed_date = _json['committed_date']
         self.message = _json['message']
@@ -20,3 +13,8 @@ class Commit:
         self.created_at = _json['created_at']
         self.title = _json['title']
         self.short_id = _json['short_id']
+        self.parent_ids = _json['parent_ids']
+
+    def getParents(self):
+        from controllers.CommitController import CommitController
+        return [CommitController.find(self.project, _id) for _id in self.parent_ids]

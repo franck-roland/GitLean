@@ -13,7 +13,7 @@ class IssueController(AbstractGitlabElementController):
         if _json:
             self._issue = IssueFactory.factory(project, _json=_json)
         elif _id:
-            self._issue = IssueController.find(_id)
+            self._issue = IssueController.find(project, _id)
         else:
             raise ValueError()
 

@@ -13,7 +13,7 @@ class TagController(AbstractGitlabElementController):
         if _json:
             self._tag = Tag(project, _json=_json)
         elif _id:
-            self._tag = TagController.find(_id)
+            self._tag = TagController.find(project, _id)
         else:
             raise ValueError()
 
