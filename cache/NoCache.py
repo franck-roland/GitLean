@@ -20,3 +20,6 @@ class NoCache(AbstractCache):
 
     def delete(self, _id):
         return True
+
+    def removeAllValues(self, _id, value):
+        return True

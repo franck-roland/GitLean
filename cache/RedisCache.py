@@ -33,3 +33,6 @@ class RedisCache(AbstractCache):
 
     def delete(self, _id):
         return self.redis_instance.delete(_id)
+
+    def removeAllValues(self, _id, value):
+        return self.redis_instance.lrem(_id, 0, value)

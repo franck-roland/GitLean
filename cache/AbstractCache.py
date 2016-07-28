@@ -26,3 +26,7 @@ class AbstractCache(metaclass=ABCMeta):
     @abstractmethod
     def delete(self, _id):
         pass
+
+    @abstractmethod
+    def removeAllValues(self, _id, value):
+        pass

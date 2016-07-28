@@ -14,5 +14,6 @@ if __name__ == '__main__':
             if project.name in config.PROJECTS:
                 issues = project.findAllIssues()
                 for issue in issues:
+                    print(issue)
                     for note in issue.findAllNotes():
                         print(note)
