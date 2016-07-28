@@ -8,12 +8,7 @@ from dateutil.parser import parse
 
 class Project(object):
 
-    def __init__(self, _id=None, _json={}):
-        if _id:
-            _json = requests.get(
-                "{}/api/v3/projects/{}".format(
-                    config.HOST, _id),
-                headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def __init__(self, _json={}):
         self.id = _json['id']
         self.description = _json['description']
         self.default_branch = _json['default_branch']
@@ -49,12 +44,6 @@ class Project(object):
         self.milestones = []
         self.issues = []
         self.tags = []
-
-    @classmethod
-    def findAll(cls):
-        _jsons = requests.get("{}/api/v3/projects".format(config.HOST),
-                              headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-        return [Project(_json=_json) for _json in _jsons]
 
     def findAllMilestones(self):
         page = 1
@@ -92,6 +81,3 @@ class Project(object):
         if not self.issues:
             self.issues = IssueController.findAll(self)
         return self.issues
-
-    def getId(self):
-        return self.id

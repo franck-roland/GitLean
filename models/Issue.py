@@ -1,16 +1,9 @@
-import config
-import requests
 from controllers.NoteController import NoteController
 
 
 class Issue:
 
-    def __init__(self, project, id=None, _json={}):
-        if id:
-            _json = requests.get(
-                "{}/api/v3/projects/{}/issues/{}".format(
-                    config.HOST, project.id, id),
-                headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def __init__(self, project, _json={}):
         self.id = _json['id']
         self.project = project
         self.project_id = _json['project_id']
@@ -38,5 +31,5 @@ class Issue:
 
     def findAllNotes(self):
         if not self.notes:
-            self.notes = sorted(NoteController.findAll(self.project, self), key=lambda x: x.created_at)
+            self.notes = sorted(NoteController.findAll(self), key=lambda x: x.created_at)
         return self.notes

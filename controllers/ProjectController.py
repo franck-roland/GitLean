@@ -1,7 +1,6 @@
 import requests
 import config
 from models.Project import Project
-from cache.factories.CacheFactory import CacheFactory
 from .AbstractGitlabElementController import AbstractGitlabElementController
 
 

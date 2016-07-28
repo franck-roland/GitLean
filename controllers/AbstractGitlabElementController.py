@@ -9,19 +9,19 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         pass
 
     @classmethod
-    def getCacheKey(cls, project, _id):
+    def getCacheKey(cls, *args):
         raise NotImplementedError
 
     @classmethod
-    def getCacheListKey(cls, project):
+    def getCacheListKey(cls, *args):
         raise NotImplementedError
 
     @classmethod
-    def requestsById(cls, project, _id):
+    def requestsById(cls, *args):
         raise NotImplementedError
 
     @classmethod
-    def requestsAll(cls, project, page, per_page):
+    def requestsAll(cls, *args, **kwargs):
         raise NotImplementedError
 
     @classmethod
@@ -32,11 +32,11 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         return cls(*args, _json=_json).getModel()
 
     @classmethod
-    def findAll(cls, *args):
+    def findAll(cls, *args, **kwargs):
         _jsons = []
         _names = CacheFactory.cnx().findList(cls.getCacheListKey(*args))
         if not _names:
-            _jsons = cls.__findAllFromHTTPQuery(*args)
+            _jsons = cls.__findAllFromHTTPQuery(*args, **kwargs)
         else:
             for _name in _names:
                 _json = CacheFactory.cnx().get(_name)
@@ -59,12 +59,12 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         return _json
 
     @classmethod
-    def __findAllFromHTTPQuery(cls, *args):
+    def __findAllFromHTTPQuery(cls, *args, **kwargs):
         page = 1
         per_page = 10
         _jsons = []
         while True:
-            result = cls.requestsAll(*args, page, per_page)
+            result = cls.requestsAll(*args, page, per_page, **kwargs)
 
             if not result:
                 break

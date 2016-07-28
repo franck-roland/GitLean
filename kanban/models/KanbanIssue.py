@@ -6,8 +6,8 @@ regex = re.compile("KB\[stage\]\[[0-9]+\]\[([a-zA-Z]+)\]")
 
 class KanbanIssue(Issue):
 
-    def __init__(self, project, id=None, _json={}):
-        super(KanbanIssue, self).__init__(project, id, _json)
+    def __init__(self, project, _json={}):
+        super(KanbanIssue, self).__init__(project, _json)
 
         self.kanban_state = None
         for label in self.labels:

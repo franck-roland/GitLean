@@ -1,6 +1,6 @@
 import requests
 import config
-from factories.IssueFactory import IssueFactory
+from controllers.IssueController import IssueController
 from dateutil.parser import parse
 
 
@@ -28,9 +28,5 @@ class Milestone:
 
     def findAllIssues(self):
         if not self.issues:
-            _jsons = requests.get(
-                "{}/api/v3/projects/{}/issues/?milestone={}".format(
-                    config.HOST, self.project.id, self.title),
-                headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
-            self.issues = [IssueFactory.factory(self.project, _json=_json) for _json in _jsons]
+            self.issues = IssueController.findAll(self.project, milestone=self)
         return self.issues

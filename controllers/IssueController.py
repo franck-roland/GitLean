@@ -1,6 +1,5 @@
 import requests
 import config
-from cache.factories.CacheFactory import CacheFactory
 from .AbstractGitlabElementController import AbstractGitlabElementController
 from factories.IssueFactory import IssueFactory
 
@@ -40,5 +39,9 @@ class IssueController(AbstractGitlabElementController):
         return requests.get("{}/api/v3/projects/{}/issues/{}".format(config.HOST, project.id, _id), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
     @classmethod
-    def requestsAll(cls, project, page, per_page):
-        return requests.get("{}/api/v3/projects/{}/issues?page={}&per_page={}".format(config.HOST, project.id, page, per_page), headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+    def requestsAll(cls, project, page, per_page, milestone=None):
+        request = "{}/api/v3/projects/{}/issues".format(config.HOST, project.id)
+        request_parameters = "page={}&per_page={}".format(page, per_page)
+        if milestone:
+            request_parameters += "&milestone=" + milestone.title
+        return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()

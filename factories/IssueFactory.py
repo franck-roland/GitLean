@@ -6,9 +6,9 @@ from models.Issue import Issue
 class IssueFactory(GitlabElementFactory):
 
     @classmethod
-    def kanbanFactory(cls, project, id=None, _json={}):
-        return KanbanIssue(project, id, _json)
+    def kanbanFactory(cls, project, _json={}):
+        return KanbanIssue(project, _json)
 
     @classmethod
-    def normalFactory(cls, project, id=None, _json={}):
-        return Issue(project, id, _json)
+    def normalFactory(cls, project, _json={}):
+        return Issue(project, _json)

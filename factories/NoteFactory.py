@@ -6,9 +6,9 @@ from models.Note import Note
 class NoteFactory(GitlabElementFactory):
 
     @classmethod
-    def kanbanFactory(cls, project, issue, id=0, _json={}):
-        return KanbanNote(project, issue, id, _json)
+    def kanbanFactory(cls, issue, _json={}):
+        return KanbanNote(issue, _json=_json)
 
     @classmethod
-    def normalFactory(cls, project, issue, id=0, _json={}):
-        return Note(project, issue, id, _json)
+    def normalFactory(cls, issue, _json={}):
+        return Note(issue, _json=_json)
