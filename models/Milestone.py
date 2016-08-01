@@ -1,4 +1,4 @@
-from controllers.IssueController import IssueController
+from controllers import IssueController
 from dateutil.parser import parse
 
 

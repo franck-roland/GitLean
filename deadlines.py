@@ -1,7 +1,7 @@
 import config
 import csv
 from datetime import datetime
-from controllers.ProjectController import ProjectController
+from controllers import ProjectController
 
 
 def writerow(csvwriter, row):

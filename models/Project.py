@@ -1,7 +1,4 @@
-from controllers.IssueController import IssueController
-from controllers.MilestoneController import MilestoneController
-from controllers.CommitController import CommitController
-from controllers.TagController import TagController
+from controllers import IssueController, MilestoneController, CommitController, TagController
 from dateutil.parser import parse
 
 

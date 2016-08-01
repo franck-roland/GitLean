@@ -25,5 +25,5 @@ class Commit:
             self.parent_ids = _json['parent_ids']
 
     def getParents(self):
-        from controllers.CommitController import CommitController
+        from controllers import CommitController
         return [CommitController(self.project, _id).find() for _id in self.parent_ids]

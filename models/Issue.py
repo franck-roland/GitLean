@@ -1,4 +1,4 @@
-from controllers.NoteController import NoteController
+from controllers import NoteController
 
 
 class Issue:

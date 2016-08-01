@@ -1,4 +1,3 @@
-from controllers.CommitController import CommitController
 
 
 class Tag:
