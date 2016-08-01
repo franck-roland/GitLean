@@ -1,9 +1,7 @@
-import config
 from abc import ABCMeta
-from kanban.models.KanbanIssue import KanbanIssue
-from kanban.models.KanbanNote import KanbanNote
-from models import Issue
-from models import Note
+from . import config
+from .kanban_models import KanbanNote, KanbanIssue
+from .models import Issue, Note
 
 
 class GitlabElementFactory(metaclass=ABCMeta):

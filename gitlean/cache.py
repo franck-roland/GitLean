@@ -1,7 +1,7 @@
 import redis
 import json
-import config
 from abc import ABCMeta, abstractmethod
+from . import config
 
 
 class CacheFactory(object):

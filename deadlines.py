@@ -1,7 +1,7 @@
-import config
+from gitlean import config
 import csv
 from datetime import datetime
-from controllers import ProjectController
+from gitlean.controllers import ProjectController
 
 
 def writerow(csvwriter, row):

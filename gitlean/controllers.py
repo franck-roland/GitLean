@@ -1,9 +1,8 @@
 import requests
-import config
-import models
 from abc import ABCMeta, abstractmethod
-from cache import CacheFactory
-from factories import IssueFactory, NoteFactory
+from . import config, models
+from .cache import CacheFactory
+from .factories import IssueFactory, NoteFactory
 
 
 class AbstractGitlabElementController(metaclass=ABCMeta):

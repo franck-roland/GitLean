@@ -26,7 +26,7 @@ class Commit:
             self.parent_ids = _json['parent_ids']
 
     def getParents(self):
-        from controllers import CommitController
+        from .controllers import CommitController
         return [CommitController(self.project, _id).find() for _id in self.parent_ids]
 
 
@@ -59,7 +59,7 @@ class Issue:
         self.notes = []
 
     def findAllNotes(self):
-        from controllers import NoteController
+        from .controllers import NoteController
         if not self.notes:
             self.notes = sorted(NoteController(self).findAll(), key=lambda x: x.created_at)
         return self.notes
@@ -82,7 +82,7 @@ class Milestone:
         self.issues = []
 
     def findAllIssues(self):
-        from controllers import IssueController
+        from .controllers import IssueController
         if not self.issues:
             self.issues = IssueController(self.project).findAll(milestone=self)
         return self.issues
@@ -141,25 +141,25 @@ class Project(object):
         self.commits = []
 
     def findAllMilestones(self):
-        from controllers import MilestoneController
+        from .controllers import MilestoneController
         if not self.milestones:
             self.milestones = MilestoneController(self).findAll()
         return self.milestones
 
     def findAllTags(self):
-        from controllers import TagController
+        from .controllers import TagController
         if not self.tags:
             self.tags = TagController(self).findAll()
         return self.tags
 
     def findAllIssues(self):
-        from controllers import IssueController
+        from .controllers import IssueController
         if not self.issues:
             self.issues = IssueController(self).findAll()
         return self.issues
 
     def findAllCommits(self):
-        from controllers import CommitController
+        from .controllers import CommitController
         if not self.commits:
             self.commits = CommitController(self).findAll()
         return self.commits
