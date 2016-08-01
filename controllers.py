@@ -2,7 +2,7 @@ import requests
 import config
 import models
 from abc import ABCMeta, abstractmethod
-from cache.factories.CacheFactory import CacheFactory
+from cache import CacheFactory
 from factories import IssueFactory, NoteFactory
 
 
