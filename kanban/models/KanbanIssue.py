@@ -1,5 +1,5 @@
 import re
-from models.Issue import Issue
+from models import Issue
 
 regex = re.compile("KB\[stage\]\[[0-9]+\]\[([a-zA-Z]+)\]")
 

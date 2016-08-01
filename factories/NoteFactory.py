@@ -1,6 +1,6 @@
 from .GitlabElementFactory import GitlabElementFactory
 from kanban.models.KanbanNote import KanbanNote
-from models.Note import Note
+from models import Note
 
 
 class NoteFactory(GitlabElementFactory):

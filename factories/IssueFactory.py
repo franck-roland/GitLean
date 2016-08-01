@@ -1,6 +1,6 @@
 from .GitlabElementFactory import GitlabElementFactory
 from kanban.models.KanbanIssue import KanbanIssue
-from models.Issue import Issue
+from models import Issue
 
 
 class IssueFactory(GitlabElementFactory):

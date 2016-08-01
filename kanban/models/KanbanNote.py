@@ -1,5 +1,5 @@
 import re
-from models.Note import Note
+from models import Note
 
 regex = re.compile(".*from \*\*([a-zA-Z]+)\*\* to \*\*([a-zA-Z]+)\*\*.*")
 

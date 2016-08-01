@@ -1,12 +1,9 @@
 import requests
 import config
+import models
 from abc import ABCMeta, abstractmethod
 from cache.factories.CacheFactory import CacheFactory
 from factories.IssueFactory import IssueFactory
-from models.Commit import Commit
-from models.Milestone import Milestone
-from models.Project import Project
-from models.Tag import Tag
 from factories.NoteFactory import NoteFactory
 
 
@@ -112,7 +109,7 @@ class CommitController(AbstractGitlabElementController):
         self._id = _id
         self.commit = None
         if _json:
-            self.commit = Commit(project, _json=_json)
+            self.commit = models.Commit(project, _json=_json)
 
     def getInstanciationFields(self):
         return [self.project]
@@ -192,7 +189,7 @@ class MilestoneController(AbstractGitlabElementController):
         self._id = _id
         self._milestone = None
         if _json:
-            self._milestone = Milestone(project, _json=_json)
+            self._milestone = models.Milestone(project, _json=_json)
 
     def getInstanciationFields(self):
         return [self.project]
@@ -263,7 +260,7 @@ class ProjectController(AbstractGitlabElementController):
         self._id = _id
         self.project = None
         if _json:
-            self.project = Project(_json=_json)
+            self.project = models.Project(_json=_json)
 
     def getInstanciationFields(self):
         return []
@@ -299,7 +296,7 @@ class TagController(AbstractGitlabElementController):
         self._id = _id
         self._tag = None
         if _json:
-            self._tag = Tag(project, _json=_json)
+            self._tag = models.Tag(project, _json=_json)
 
     def getProject(self):
         return self.project
