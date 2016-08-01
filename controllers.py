@@ -3,8 +3,7 @@ import config
 import models
 from abc import ABCMeta, abstractmethod
 from cache.factories.CacheFactory import CacheFactory
-from factories.IssueFactory import IssueFactory
-from factories.NoteFactory import NoteFactory
+from factories import IssueFactory, NoteFactory
 
 
 class AbstractGitlabElementController(metaclass=ABCMeta):
