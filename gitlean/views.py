@@ -5,5 +5,5 @@ from . import models
 
 @csrf_exempt
 def githook(request):
-    obj = models.GitlabHook(request)
-    return HttpResponse(str(obj))
+    models.GitlabHook(request)
+    return HttpResponse("")

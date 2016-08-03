@@ -36,6 +36,14 @@ class AbstractCache(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def decr(self, _id):
+        pass
+
+    @abstractmethod
+    def incr(self, _id):
+        pass
+
+    @abstractmethod
     def pushToList(self, _id, *args):
         pass
 
@@ -45,6 +53,10 @@ class AbstractCache(metaclass=ABCMeta):
 
     @abstractmethod
     def removeAllValues(self, _id, value):
+        pass
+
+    @abstractmethod
+    def listLen(self, _id):
         pass
 
 
@@ -62,6 +74,12 @@ class NoCache(AbstractCache):
     def findList(self, _id):
         return []
 
+    def decr(self, _id):
+        return 0
+
+    def incr(self, _id):
+        return 0
+
     def pushToList(self, _id, *args):
         return True
 
@@ -70,6 +88,9 @@ class NoCache(AbstractCache):
 
     def removeAllValues(self, _id, value):
         return True
+
+    def listLen(self, _id):
+        return 0
 
 
 class RedisCache(AbstractCache):
@@ -85,9 +106,17 @@ class RedisCache(AbstractCache):
 
         return json.loads(result.decode('utf-8'))
 
-    def set(self, _id, _dict, expire=3600):
-        result = self.redis_instance.set(_id, json.dumps(_dict))
-        self.redis_instance.expire(_id, expire)
+    def set(self, _id, _value=None, _dict={}, expire=0):
+
+        if _value is not None:
+            result = self.redis_instance.set(_id, _value)
+        elif _dict:
+            result = self.redis_instance.set(_id, json.dumps(_dict))
+        else:
+            raise ValueError("At least one of _value or _dict must be set")
+
+        if expire:
+            self.redis_instance.expire(_id, expire)
         return result
 
     def findAllLike(self, pattern):
@@ -96,6 +125,15 @@ class RedisCache(AbstractCache):
 
     def findList(self, _id):
         return self.redis_instance.lrange(_id, 0, -1)
+
+    def decr(self, _id):
+        return self.redis_instance.decr(_id)
+
+    def incr(self, _id):
+        return self.redis_instance.incr(_id)
+
+    def listLen(self, _id):
+        return self.redis_instance.llen(_id)
 
     def pushToList(self, _id, *args):
         return self.redis_instance.lpush(_id, *args)

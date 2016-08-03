@@ -20,6 +20,10 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def setModel(self, _json):
+        pass
+
+    @abstractmethod
     def getInstanciationFields(self):
         pass
 
@@ -33,6 +37,9 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
     def getCacheListKey(self):
         raise NotImplementedError
 
+    def getCacheCountKey(self):
+        return self.getCacheListKey() + ":count"
+
     def requestsById(self):
         raise NotImplementedError
 
@@ -44,6 +51,10 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         return results
 
     def flushAndUpdate(self):
+        cache_keys = CacheFactory.cnx().findList(self.getCacheListKey())
+        if cache_keys:
+            CacheFactory.cnx().removeAllValues(self.getCacheListKey(), self.getCacheKey())
+            CacheFactory.cnx().set(self.getCacheCountKey(), _value=CacheFactory.cnx().listLen(self.getCacheListKey()))
         CacheFactory.cnx().delete(self.getCacheKey())
         return self.find()
 
@@ -51,42 +62,47 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
         _json = CacheFactory.cnx().get(self.getCacheKey())
         if not _json:
             _json = self.__findFromHTTPQuery()
+        self.setModel(_json)
         return self.getModel()
 
     def findAll(self, **kwargs):
         _jsons = []
+        count = CacheFactory.cnx().get(self.getCacheCountKey())
         cache_keys = CacheFactory.cnx().findList(self.getCacheListKey())
 
-        if not cache_keys:
-            _jsons = self.__findAllFromHTTPQuery(**kwargs)
+        if count is None:
+            _jsons = self.__findAllFromHTTPQuery()
+            return self.findAll(**kwargs)
 
-        else:
-            for cache_key in cache_keys:
+        for cache_key in cache_keys:
 
-                _json = CacheFactory.cnx().get(cache_key)
+            _json = CacheFactory.cnx().get(cache_key)
 
-                if not _json:
-                    CacheFactory.cnx().removeAllValues(self.getCacheListKey(), cache_key)
-                    cache_key = cache_key.decode('utf-8')
-                    self._id = self.getIdFromCacheKey(cache_key)
-                    _json = self.__findFromHTTPQuery()
+            if not _json:
+                CacheFactory.cnx().removeAllValues(self.getCacheListKey(), cache_key)
+                CacheFactory.cnx().set(self.getCacheCountKey(), _value=CacheFactory.cnx().listLen(self.getCacheListKey()))
+                cache_key = cache_key.decode('utf-8')
+                self._id = self.getIdFromCacheKey(cache_key)
+                _json = self.__findFromHTTPQuery()
 
-                if _json:
-                    _jsons.append(_json)
+            if _json:
+                _jsons.append(_json)
 
         return [self.__class__(*list(self.getInstanciationFields()), _json=_json).getModel() for _json in _jsons]
 
     def __findFromHTTPQuery(self):
         _json = self.requestsById()
         if _json:
-            CacheFactory.cnx().set(self.getCacheKey(), _json)
+            CacheFactory.cnx().set(self.getCacheKey(), _dict=_json)
             CacheFactory.cnx().pushToList(self.getCacheListKey(), self.getCacheKey())
+            CacheFactory.cnx().set(self.getCacheCountKey(), _value=CacheFactory.cnx().listLen(self.getCacheListKey()))
         return _json
 
     def __findAllFromHTTPQuery(self, **kwargs):
         page = 1
         per_page = 10
         _jsons = []
+        CacheFactory.cnx().set(self.getCacheCountKey(), _value=0)
         while True:
             result = self.requestsAll(page, per_page, **kwargs)
 
@@ -95,8 +111,9 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
 
             for _json in result:
                 self._id = self.getIdFieldFromJson(_json)
-                CacheFactory.cnx().set(self.getCacheKey(), _json)
+                CacheFactory.cnx().set(self.getCacheKey(), _dict=_json)
                 CacheFactory.cnx().pushToList(self.getCacheListKey(), self.getCacheKey())
+                CacheFactory.cnx().incr(self.getCacheCountKey())
             _jsons += result
             page += 1
 
@@ -111,7 +128,7 @@ class CommitController(AbstractGitlabElementController):
         self._id = _id
         self.commit = None
         if _json:
-            self.commit = models.Commit(project, _json=_json)
+            self.setModel(_json=_json)
 
     def getInstanciationFields(self):
         return [self.project]
@@ -121,6 +138,9 @@ class CommitController(AbstractGitlabElementController):
 
     def getCommit(self):
         return self.commit
+
+    def setModel(self, _json):
+        self.commit = models.Commit(self.project, _json=_json)
 
     def getModel(self):
         return self.commit
@@ -140,7 +160,6 @@ class CommitController(AbstractGitlabElementController):
             return []
         request = "{}/api/v3/projects/{}/repository/commits".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
-        print(request + "?" + request_parameters)
         return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
 
@@ -152,7 +171,7 @@ class IssueController(AbstractGitlabElementController):
         self._id = _id
         self.issue = None
         if _json:
-            self.issue = IssueFactory.factory(project, _json=_json)
+            self.setModel(_json=_json)
 
     def getInstanciationFields(self):
         return [self.project]
@@ -162,6 +181,9 @@ class IssueController(AbstractGitlabElementController):
 
     def getIssue(self):
         return self.issue
+
+    def setModel(self, _json):
+        self.issue = IssueFactory.factory(self.project, _json=_json)
 
     def getModel(self):
         return self.issue
@@ -191,7 +213,7 @@ class MilestoneController(AbstractGitlabElementController):
         self._id = _id
         self._milestone = None
         if _json:
-            self._milestone = models.Milestone(project, _json=_json)
+            self.setModel(_json)
 
     def getInstanciationFields(self):
         return [self.project]
@@ -201,6 +223,9 @@ class MilestoneController(AbstractGitlabElementController):
 
     def getMilestone(self):
         return self._milestone
+
+    def setModel(self, _json):
+        self._milestone = models.Milestone(self.project, _json=_json)
 
     def getModel(self):
         return self._milestone
@@ -228,7 +253,7 @@ class NoteController(AbstractGitlabElementController):
         self._id = _id
         self._note = None
         if _json:
-            self._note = NoteFactory.factory(issue, _json=_json)
+            self.setModel(_json)
 
     def getInstanciationFields(self):
         return [self.issue]
@@ -238,6 +263,9 @@ class NoteController(AbstractGitlabElementController):
 
     def getNote(self):
         return self._note
+
+    def setModel(self, _json):
+        self._note = NoteFactory.factory(self.issue, _json)
 
     def getModel(self):
         return self._note
@@ -262,13 +290,16 @@ class ProjectController(AbstractGitlabElementController):
         self._id = _id
         self.project = None
         if _json:
-            self.project = models.Project(_json=_json)
+            self.setModel(_json=_json)
 
     def getInstanciationFields(self):
         return []
 
     def getProject(self):
         return self.project
+
+    def setModel(self, _json):
+        self.project = models.Project(_json)
 
     def getModel(self):
         return self.project
@@ -298,13 +329,16 @@ class TagController(AbstractGitlabElementController):
         self._id = _id
         self._tag = None
         if _json:
-            self._tag = models.Tag(project, _json=_json)
+            self.setModel(_json=_json)
 
     def getProject(self):
         return self.project
 
     def getTag(self):
         return self._tag
+
+    def setModel(self, _json):
+        self._tag = models.Tag(self.project, _json=_json)
 
     def getModel(self):
         return self._tag
