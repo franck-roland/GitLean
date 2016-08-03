@@ -1,5 +1,5 @@
 PRIVATE_TOKEN = "Your private token you can find on Gitlab"
-HOST = 'https://gitlab.h42.fr'
+HOST = 'https://gitlab.repo.fr'
 PROJECTS = ['list of projects names']
 MANAGEMENT_ENV = 'kanban'
 CACHE_CONFIG = {
