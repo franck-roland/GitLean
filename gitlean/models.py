@@ -11,7 +11,9 @@ class GitlabHook:
 
     def _update_issue(self):
         from . import controllers
+        print(self.params)
         project = controllers.ProjectController(_id=self.params['object_attributes']['project_id']).find()
+        print(project)
         issue = controllers.IssueController(project, _id=self.params['object_attributes']['id']).flushAndUpdate()
         return issue
 
