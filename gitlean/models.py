@@ -8,12 +8,12 @@ class GitlabHook:
         self.params = json.loads(request.body.decode('utf-8'))
         if self.params['object_kind'] == 'issue':
             self._update_issue()
+        elif self.params['object_kind'] == 'note':
+            self._update_note()
 
     def _update_issue(self):
         from . import controllers
-        print(self.params)
         project = controllers.ProjectController(_id=self.params['object_attributes']['project_id']).find()
-        print(project)
         issue = controllers.IssueController(project, _id=self.params['object_attributes']['id']).flushAndUpdate()
         return issue
 
@@ -83,6 +83,7 @@ class Issue:
             self.due_date = _json['due_date']
         self.notes = []
 
+    @property
     def findAllNotes(self):
         from .controllers import NoteController
         if not self.notes:
@@ -165,24 +166,28 @@ class Project(object):
         self.tags = []
         self.commits = []
 
+    @property
     def findAllMilestones(self):
         from .controllers import MilestoneController
         if not self.milestones:
             self.milestones = MilestoneController(self).findAll()
         return self.milestones
 
+    @property
     def findAllTags(self):
         from .controllers import TagController
         if not self.tags:
             self.tags = TagController(self).findAll()
         return self.tags
 
+    @property
     def findAllIssues(self):
         from .controllers import IssueController
         if not self.issues:
             self.issues = IssueController(self).findAll()
         return self.issues
 
+    @property
     def findAllCommits(self):
         from .controllers import CommitController
         if not self.commits:

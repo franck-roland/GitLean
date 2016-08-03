@@ -160,7 +160,6 @@ class CommitController(AbstractGitlabElementController):
             return []
         request = "{}/api/v3/projects/{}/repository/commits".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
-        print(request + "?" + request_parameters)
         return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
 
 
