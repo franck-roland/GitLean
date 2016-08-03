@@ -370,3 +370,15 @@ class TagController(AbstractGitlabElementController):
         request = "{}/api/v3/projects/{}/repository/tags".format(config.HOST, self.project.id)
         request_parameters = "page={}&per_page={}".format(page, per_page)
         return requests.get(request + "?" + request_parameters, headers={"PRIVATE-TOKEN": config.PRIVATE_TOKEN}).json()
+
+
+class Login():
+
+    @classmethod
+    def get_private_token(cls, login, password):
+        payload = {'login': login, 'password': password}
+        request = "{}/api/v3/session".format(config.HOST)
+        response = requests.post(request, data=payload)
+        if int(response.status_code / 100) == 2:
+            return response.json()['private_token']
+        return None
