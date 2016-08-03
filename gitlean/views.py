@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from . import models
 
-# Create your views here.
+
+@csrf_exempt
+def githook(request):
+    obj = models.GitlabHook(request)
+    return HttpResponse(str(obj))

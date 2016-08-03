@@ -43,6 +43,10 @@ class AbstractGitlabElementController(metaclass=ABCMeta):
     def filter(cls, results, **kwargs):
         return results
 
+    def flushAndUpdate(self):
+        CacheFactory.cnx().delete(self.getCacheKey())
+        return self.find()
+
     def find(self):
         _json = CacheFactory.cnx().get(self.getCacheKey())
         if not _json:

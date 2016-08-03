@@ -1,4 +1,27 @@
+import json
 from dateutil.parser import parse
+
+
+class GitlabHook:
+
+    def __init__(self, request):
+        self.params = json.loads(request.body.decode('utf-8'))
+        if self.params['object_kind'] == 'issue':
+            self._update_issue()
+
+    def _update_issue(self):
+        from . import controllers
+        project = controllers.ProjectController(_id=self.params['object_attributes']['project_id']).find()
+        issue = controllers.IssueController(project, _id=self.params['object_attributes']['id']).flushAndUpdate()
+        return issue
+
+    def _update_note(self):
+        from . import controllers
+        project = controllers.ProjectController(_id=self.params['project_id']).find()
+        if "issue" in self.params:
+            issue = controllers.IssueController(project, _id=self.params['issue']['id']).find()
+            note = controllers.NoteController(issue, _id=self.params['object_attributes']['id']).flushAndUpdate()
+        return note
 
 
 class Commit:
