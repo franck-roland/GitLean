@@ -1,0 +1,57 @@
+<head>
+    <style type="text/css">
+        ul {
+            list-style-type: none;
+            display: flex;
+            width: 100%;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+        li {
+            flex-basis: 400px;
+            box-shadow: 1px 1px 10px grey;
+            margin: 10px 5px;
+            display: block;
+        }
+        .icebox {
+            background: #b6e4fc;
+        }
+        .specs {
+            background: #b6fcd9;
+        }
+        .backlog {
+            background: #fceab6;
+        }
+        .development {
+            background: #b6b6fc;
+        }
+        .review {
+            background: #eab6fc;
+        }
+        .testing {
+            background: #fcb6b6;
+        }
+    </style>
+</head>
+<html>
+    <body>
+    <h1>{{project.name}}</h1>
+        <ul>
+            {% for issue in issues %}
+            <li class="{{issue.kanban_state|lower}}">
+                <b>{{issue.title}}</b><br/>
+                <i>
+                    {% for label in issue.labels %}
+                        {{label}},
+                    {% endfor %}
+                </i>
+                <br/>
+                {% for note in issue.findAllNotes %}
+                <em>{{note.body}}</em><br/>
+                {% endfor %}
+                {{issue.description}}
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
